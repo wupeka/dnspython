@@ -371,7 +371,7 @@ class Message(object):
             rrset = None
         return rrset
 
-    def to_wire(self, origin=None, max_size=0, **kw):
+    def to_wire(self, origin=None, max_size=0, compress=True, **kw):
         """Return a string containing the message in DNS compressed wire
         format.
 
@@ -397,7 +397,7 @@ class Message(object):
             max_size = 512
         elif max_size > 65535:
             max_size = 65535
-        r = dns.renderer.Renderer(self.id, self.flags, max_size, origin)
+        r = dns.renderer.Renderer(self.id, self.flags, max_size, origin, compress)
         for rrset in self.question:
             r.add_question(rrset.name, rrset.rdtype, rrset.rdclass)
         for rrset in self.answer:

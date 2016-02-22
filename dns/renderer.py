@@ -71,7 +71,7 @@ class Renderer(object):
     @type mac: string
     """
 
-    def __init__(self, id=None, flags=0, max_size=65535, origin=None):
+    def __init__(self, id=None, flags=0, max_size=65535, origin=None, compress=True):
         """Initialize a new renderer.
 
         @param id: the message id
@@ -94,7 +94,10 @@ class Renderer(object):
         self.flags = flags
         self.max_size = max_size
         self.origin = origin
-        self.compress = {}
+        if compress:
+            self.compress = {}
+        else:
+            self.compress = None
         self.section = QUESTION
         self.counts = [0, 0, 0, 0]
         self.output.write('\x00' * 12)
@@ -111,12 +114,13 @@ class Renderer(object):
 
         self.output.seek(where)
         self.output.truncate()
-        keys_to_delete = []
-        for k, v in self.compress.iteritems():
-            if v >= where:
-                keys_to_delete.append(k)
-        for k in keys_to_delete:
-            del self.compress[k]
+        if self.compress is not None:
+            keys_to_delete = []
+            for k, v in self.compress.iteritems():
+                if v >= where:
+                    keys_to_delete.append(k)
+            for k in keys_to_delete:
+                del self.compress[k]
 
     def _set_section(self, section):
         """Set the renderer's current section.
